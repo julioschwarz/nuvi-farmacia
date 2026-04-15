@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Assistente de Vendas — Farmácias Nuvi</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --green: #1D9E75;
+    --green-light: #E1F5EE;
+    --green-dark: #0F6E56;
+    --green-muted: #9FE1CB;
+    --bg: #F7F8F6;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.08);
+    --border-strong: rgba(0,0,0,0.15);
+    --text: #1A1A1A;
+    --text-muted: #6B7280;
+    --text-light: #9CA3AF;
+    --amber-bg: #FAEEDA;
+    --amber-text: #633806;
+    --red-bg: #FCEBEB;
+    --red-text: #791F1F;
+    --blue-bg: #E6F1FB;
+    --blue-text: #0C447C;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    width: 36px; height: 36px;
+    background: var(--green);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 600; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .topbar-title { font-weight: 600; font-size: 15px; }
+  .topbar-sub { font-size: 12px; color: var(--text-muted); }
+  .topbar-badge {
+    margin-left: auto;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  /* MAIN LAYOUT */
+  .main { max-width: 780px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 6px; margin-bottom: 1.25rem; }
+  .tab {
+    padding: 8px 18px;
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    background: var(--surface);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: all .15s;
+  }
+  .tab:hover { border-color: var(--green); color: var(--green); }
+  .tab.active { background: var(--green); color: white; border-color: var(--green); }
+
+  /* API KEY PANEL */
+  .api-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .api-panel .field { flex: 1; }
+  .api-panel label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 5px; font-weight: 500; }
+  .api-input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+  .api-input:focus { outline: none; border-color: var(--green); }
+  .api-save {
+    padding: 9px 18px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .api-save:hover { background: var(--green-dark); }
+  .api-status { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+  .api-status.ok { color: var(--green-dark); }
+
+  /* SEARCH */
+  .search-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .search-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .search-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .search-input:focus { outline: none; border-color: var(--green); background: white; }
+  .search-btn {
+    padding: 12px 22px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    transition: background .15s;
+    white-space: nowrap;
+  }
+  .search-btn:hover { background: var(--green-dark); }
+  .search-btn:disabled { background: var(--green-muted); cursor: not-allowed; }
+
+  /* CHIPS */
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    padding: 5px 13px;
+    border: 1px solid var(--border-strong);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text-muted);
+    background: var(--bg);
+    transition: all .12s;
+  }
+  .chip:hover { border-color: var(--green); color: var(--green); background: var(--green-light); }
+
+  /* THINKING */
+  .thinking {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .dots { display: flex; gap: 5px; }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 1.2s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: .2s; }
+  .dot:nth-child(3) { animation-delay: .4s; }
+  @keyframes pulse { 0%,80%,100%{opacity:.25;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
+
+  /* RESULT */
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    animation: fadeIn .3s ease;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+  .result-query {
+    font-size: 12px;
+    color: var(--text-muted);
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  .result-query span { color: var(--text); }
+  .ai-note {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    padding: 10px 14px;
+    background: var(--green-light);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--green);
+    margin-bottom: 12px;
+  }
+
+  /* PRODUCT CARDS */
+  .prod-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    transition: border-color .12s;
+  }
+  .prod-card:hover { border-color: var(--green-muted); }
+  .prod-card.first { border-color: var(--green); background: #FAFFFE; }
+  .prod-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .prod-sku { font-size: 11px; color: var(--text-light); font-family: 'DM Mono', monospace; margin-bottom: 6px; }
+  .prod-just { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+  .badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
+  .badge {
+    font-size: 11px; font-weight: 500;
+    padding: 2px 9px; border-radius: 10px;
+    display: inline-block;
+  }
+  .b-marca { background: var(--blue-bg); color: var(--blue-text); }
+  .b-gen { background: #EAF3DE; color: #27500A; }
+  .b-ind { background: var(--amber-bg); color: var(--amber-text); }
+  .b-prio {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    color: var(--text-muted);
+  }
+  .b-prio.first { border-color: var(--green); color: var(--green-dark); }
+
+  /* ALERTS */
+  .alert {
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .alert-warn { background: var(--amber-bg); color: var(--amber-text); }
+  .alert-danger { background: var(--red-bg); color: var(--red-text); }
+
+  /* SORTIMENTO TAB */
+  .sort-panel { display: none; }
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    text-align: center;
+  }
+  .stat-val { font-size: 24px; font-weight: 600; color: var(--text); }
+  .stat-lbl { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .sort-filter {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .sort-filter:focus { outline: none; border-color: var(--green); }
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+  th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--text-muted);
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+  }
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+
+  /* EMPTY STATE */
+  .empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+  .empty-icon {
+    width: 48px; height: 48px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 22px;
+  }
+
+  @media (max-width: 600px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .api-panel { flex-direction: column; }
+    .topbar-badge { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Rx</div>
+  <div>
+    <div class="topbar-title">Assistente de Vendas — Farmácias Nuvi</div>
+    <div class="topbar-sub">Sortimento real · IA integrada</div>
+  </div>
+  <div class="topbar-badge">819 produtos</div>
+</div>
+
+<div class="main">
+
+
+
+  <!-- TABS -->
+  <div class="tabs">
+    <div class="tab active" id="tb-busca" onclick="sw('busca')">Consulta balcão</div>
+    <div class="tab" id="tb-sort" onclick="sw('sort')">Sortimento (819)</div>
+  </div>
+
+  <!-- BUSCA -->
+  <div id="busca-panel">
+    <div class="search-wrap">
+      <div class="search-row">
+        <input class="search-input" id="qi" type="text"
+          placeholder="Ex: hemorroidas, tosse com febre, dor muscular, malária..."
+          onkeydown="if(event.key==='Enter')go()"/>
+        <button class="search-btn" id="btn" onclick="go()">Consultar IA</button>
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div id="res"></div>
+  </div>
+
+  <!-- SORTIMENTO -->
+  <div class="sort-panel" id="sort-panel">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-val">819</div><div class="stat-lbl">Total produtos</div></div>
+      <div class="stat-card"><div class="stat-val">217</div><div class="stat-lbl">Indianos</div></div>
+      <div class="stat-card"><div class="stat-val">355</div><div class="stat-lbl">Genéricos</div></div>
+    </div>
+    <input class="sort-filter" id="sort-q" type="text" placeholder="Filtrar por nome ou categoria..." oninput="filterSort()"/>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:60px">SKU</th>
+          <th>Nome</th>
+          <th style="width:80px">Tipo</th>
+          <th>Categoria</th>
+        </tr></thead>
+        <tbody id="sort-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SORT=[["32736","Adrenalina inj 1ml amp","Sistema Nervoso Central","Anestésico e estimul","G"],["33111","Miradent escova descartáveis","Rosto e corpo","Produtos bucodentári","M"],["34142","Piroxicam 20mg cp","Aparelho locomotor","Dor e inflamação","G"],["33278","Pensos Rápidos","Material gastável","Curativos","M"],["32905","Compressas Gaze Esteril 5x5cm","Material gastável","Curativos","G"],["33249","Complexo B Cp ID","Nutrição","Vitaminas e complexo","I"],["34613","Ciprofloxaxina Gotas Oft ID","Medicamentos usados em afecções oculares","Antibióticos","I"],["33917","Multivitamínico Cp ID","Nutrição","Memória e cansaço","I"],["33208","Nitrofurantoína cp","Medicamentos anti-infecciosos","Antifúngicos","G"],["33072","Glibenclamida 5mg Cp ID","Hormonas e medicamentos usados no tratam","Diabetes","I"],["33673","Sinvastatina 40mg cp MG","Aparelho cardiovascular","Colesterol","G"],["32941","Hidroclorotiazida 25mg Cp ID","Aparelho cardiovascular","Tensão","I"],["35036","Tetraciclina Pom Oft ID","Medicamentos usados em afecções oculares","Antibióticos","I"],["33192","Amlodipina 10mg Cp ID","Aparelho cardiovascular","Tensão","I"],["32949","Dexametasona 0,5mg Cp ID","Hormonas e medicamentos usados no tratam","Cortisona","I"],["33907","Vitamina B1+B6+B12 Ampola ID","Nutrição","Vitaminas e complexo","I"],["33193","Amlodipina 5mg Cp ID","Aparelho cardiovascular","Tensão","I"],["34680","Colírio Hidratação Ocular ID","Medicamentos usados em infecções oculare","Gotas oculares","I"],["32856","Bisacodilo 5mg Cp ID","Aparelho digestivo","Laxante","I"],["34612","C8 Forte Cp ID","Nutrição","Apetite","I"],["33187","Sinvastatina 20mg Cp MG","Aparelho cardiovascular","Colesterol","G"],["33301","Vitamina Complexo B INJ ID","Nutrição","Vitaminas e complexo","I"],["33695","Trifene 200mg Cp","Aparelho locomotor","Dor e inflamação","G"],["33191","Ciprofloxaxina Gotas Auriculares ID","Medicamentos usados em infecções otorrin","Antibióticos","I"],["32920","Certeza Cp Desinfectantes","Desinfectantes","Desinfectantes","G"],["32892","Captopril 25mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33941","Salbutamol 4mg Cp ID","Aparelho respiratório","Broncodilatador","I"],["32739","Água Injectáveis 100% INJ ID","Material gastável","Soros","I"],["33303","Vitamina C Inj","Nutrição","Vitaminas e complexo","G"],["33302","Vitamina B6 Inj 100mg/2ml ID","Nutrição","Vitaminas e complexo","I"],["33089","Metronidazol 500mg Óvulos Vag ID","Medicamentos anti-infecciosos","Antibióticos","I"],["34092","Diclofenac 50mg Cp ID","Aparelho locomotor","Dor e inflamação","I"],["33133","Loratadina Xarope ID","Medicação antialérgica","Antialérgicos","I"],["33219","Ácido Fólico 200mg Cp ID","Sangue","Anemias e gravidez","I"],["33725","Sinvastatina 10mg Basi","Aparelho cardiovascular","Colesterol","M"],["33213","Soro Oral Saquetas ID","Nutrição","Re-hidratação","I"],["33025","Sulfadoxina + Pirimetamina 3 Cp ID","Medicamentos malária","Tratamento malária","I"],["33206","Nimesulida 100mg cp MG","Aparelho locomotor","Dor e inflamação","G"],["33268","Valsartan 80mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33131","Loperamida 2mg Cp ID","Aparelho digestivo","Diarreia","I"],["33875","Trancozema Creme ID","Medicação antialérgica","Antifúngicos","I"],["32890","Candesartan + HCTZ  16+12.5 Cp MG","Aparelho cardiovascular","Tensão","G"],["33928","Artemether 20mg Inj ID","Medicamentos malária","Tratamento malária","I"],["34284","Prometazina Susp Oral ID","Medicação antialérgica","Antialérgicos","I"],["33108","Metoclopramida 10mg cp MG","Aparelho digestivo","Antiemético","G"],["33790","Cetoconazol creme ID","Hormonas e medicamentos usados no tratam","Cortisona","I"],["32894","Indamapida 2,5mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33485","Buscopan Supositório","Aparelho digestivo","Anticólicas","M"],["32893","Captopril 50mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33195","Pastilhas Garganta e Tosse ID","Aparelho respiratório","Pastilhas e desinfec","I"],["32763","Alprazolam 1mg Cp MG","Sistema Nervoso Central","Psicotrópicos","G"],["32781","Artemether 80mg/ml Amp ID","Medicamentos malária","Tratamento malária","I"],["33067","Artemether+Lumefantrina 20+120mg Cp ID","Medicamentos malária","Tratamento malária","I"],["32749","Alopurinol 100mg Cp MG","Aparelho locomotor","Ácido úrico","G"],["33257","Omeprazol 20mg Cp ID","Aparelho digestivo","Protecção gástrica","I"],["33915","Furosemida INJ ID","Aparelho cardiovascular","Tensão","I"],["33290","Polygel Cp ID","Aparelho digestivo","Antiácidos","I"],["33101","Metronidazol 250mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33782","Ampicilina 500mg Cp MG","Medicamentos anti-infecciosos","Antibióticos","G"],["33854","Ibuprofeno 600mg Saquetas MG","Aparelho locomotor","Dor e inflamação","G"],["33159","Diclofenac 100mg LP cp ID","Aparelho locomotor","Dor e inflamação","I"],["35065","Paracetamol+Aceclofenac ID","Aparelho locomotor","Dor e inflamação","I"],["33209","Champoo Piolhos ID","Outros","Piolhos","I"],["33733","Fluoxetina 20mg Cp MG","Sistema Nervoso Central","Antidepressivo","G"],["34524","Ben-u-ron 500mg 10Supositórios","Sistema Nervoso Central","Dor e febre","M"],["32764","Alprazolam 0,25mg Cp MG","Sistema Nervoso Central","Psicotrópicos","G"],["33080","Clotrimazol Comp Vaginal ID","Medicamentos anti-infecciosos","Antifúngicos","I"],["33024","Etoricoxib 90mg Cp MG","Aparelho locomotor","Dor e inflamação","G"],["33929","Antigripal Xarope Infantil ID","Sistema Nervoso Central","Dor e febre","I"],["33074","Gliclazida 30mg cp MG","Hormonas e medicamentos usados no tratam","Diabetes","G"],["33903","Gentamicina Ampola INJ ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33324","Sais Tradicionais Saquetas ID","Aparelho digestivo","Antiácidos","I"],["34287","Nifedipina 20mg Cp ID","Aparelho cardiovascular","Tensão","I"],["32956","Cloreto Sódio 0,9% 500ml","Material gastável","Soros","M"],["32861","Brânulas Cateter n20 ID","Material gastável","Sistemas","I"],["33483","Buscopan 10mg Cp","Aparelho digestivo","Anticólicas","G"],["32780","Artemether 40mg/ml Amp ID","Medicamentos malária","Tratamento malária","I"],["32777","Atorvastatina 40mg Cp MG","Aparelho cardiovascular","Colesterol","G"],["32983","Hidroclorotiazida 25mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33015","Enalapril 10mg Cp MG","Aparelho cardiovascular","Tensão","G"],["32990","Dipirona Ampola ID","Aparelho locomotor","Dor e inflamação","I"],["33844","Metro + Norfloxacina Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["35032","Piroxicam 20mg Cp ID","Aparelho locomotor","Dor e inflamação","I"],["32993","Ibuprofeno Xarope ID","Aparelho locomotor","Dor e inflamação","I"],["33117","Antigripal Cp ID","Sistema Nervoso Central","Dor e febre","I"],["33592","Enalapril 20mg Cp ID","Aparelho cardiovascular","Tensão","I"],["32989","Ibuprofeno 400mg Cp ID","Aparelho locomotor","Dor e inflamação","I"],["33062","Lactato Ringer 500ml ID","Material gastável","Soros","I"],["33340","Sildenafil 100mg Cp ID","Aparelho reprodutor","Sexualidade","I"],["33292","Omeprazol INJ ID","Aparelho digestivo","Protecção gástrica","I"],["32838","Paracetamol Grip Susp Oral ID","Sistema Nervoso Central","Dor e febre","I"],["33258","Omeprazol 40mg Cp ID","Aparelho digestivo","Protecção gástrica","I"],["34667","Sulfato Fe + Ac Fólico Cp ID","Sangue","Anemias e gravidez","I"],["33057","Clotrimazol Creme ID","Medicamentos anti-infecciosos","Antifúngicos","I"],["33241","Tetraciclina 250mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["32944","Descongestionante Nasal AD ID","Aparelho respiratório","Descongestionantes","I"],["33125","Ligadura Gaze 10x10cm","Material gastável","Curativos","M"],["32752","Amoxi+Ac Clavulânico 500+125 Cp MG","Medicamentos anti-infecciosos","Antibióticos","G"],["32992","Dipirona Cp ID","Aparelho locomotor","Dor e inflamação","I"],["32765","Paracetamol 125mg Sup ID","Sistema Nervoso Central","Dor e febre","I"],["33918","Fluconazol 150mg Cp ID","Medicamentos anti-infecciosos","Antifúngicos","I"],["33196","Xarope Tosse ID","Aparelho respiratório","Expectorantes","I"],["32762","Alprazolam 0,5mg Cp MG","Sistema Nervoso Central","Psicotrópicos","G"],["33002","Doxiciclina 100mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33136","Losartan 50+12,5mg Cp ID","Aparelho cardiovascular","Tensão","I"],["32924","Vitamina C Xarope ID","Nutrição","Vitaminas e complexo","I"],["33304","Vitanium Cp","Nutrição","Vitaminas e complexo","G"],["33218","Cotrimoxazol Susp Oral ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33730","Enalapril 20mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33332","Sildenafil 50mg Cp ID","Aparelho reprodutor","Sexualidade","I"],["32974","Dicolaine Gel 50g","Aparelho locomotor","Dor e inflamação","G"],["34683","Mebendazol Xarope ID","Medicamentos anti-infecciosos","Desparasitantes","I"],["33104","Metronidazol Infusão ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33102","Metronidazol 125mg Susp oral ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33203","Nifedipina 60mg Cp ID","Aparelho cardiovascular","Tensão","I"],["33806","Carbamazepina 200mg Cp MG","Sistema Nervoso Central","Antiepiléticos e ant","G"],["33310","Mebendazol 100mg Cp ID","Medicamentos anti-infecciosos","Desparasitantes","I"],["35033","Complexo B Xarope ID","Nutrição","Vitaminas e complexo","I"],["33069","Gentamicina Gotas Oft ID","Medicamentos usados em afecções oculares","Antibióticos","I"],["33902","Diclofenac INJ ID","Aparelho locomotor","Dor e inflamação","I"],["32769","Salbutamol Xarope ID","Aparelho respiratório","Broncodilatador","I"],["33261","UL 250 Caps","Aparelho digestivo","Diarreia","G"],["32945","Descongestionante Nasal INF ID","Aparelho respiratório","Descongestionantes","I"],["33100","Metamizol Cinfa 575mg Cp","Sistema Nervoso Central","Dor e inflamação","G"],["33809","Cefalexina 500mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33037","Fluconazol 150mg Cp MG","Medicamentos anti-infecciosos","Antifúngicos","G"],["34201","Losartan 100+25mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33137","Losartan 50mg Cp ID","Aparelho cardiovascular","Tensão","I"],["33686","Paracetamol 150mg Susp Oral ID","Sistema Nervoso Central","Dor e febre","I"],["33225","Albendazol Susp Oral ID","Medicamentos anti-infecciosos","Desparasitantes","I"],["33179","Ciprofloxacina INJ ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33294","Prednisolona 5mg Cp MG","Hormonas e medicamentos usados no tratam","Cortisona","G"],["33140","Losartan 100mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33075","Artemether+Lumef 20+120mg 24Cp ID","Medicamentos malária","Tratamento malária","I"],["32741","Amlodipina 5mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33245","Tramadol+paracetamol 37,5+325mg Cp MG","Sistema Nervoso Central","Dor e febre","G"],["33158","Diclofenac Gel ID","Aparelho locomotor","Dor e inflamação","I"],["33942","Carbamazepina 400mg Cp MG","Sistema Nervoso Central","Antiepiléticos e ant","G"],["33905","Flagyl 250mg Cp","Medicamentos anti-infecciosos","Antibióticos","G"],["32895","Artemether+Lumefantrina 80+480mg Cp ID","Medicamentos malária","Tratamento malária","I"],["33018","Eritromicina 250mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["32908","Bromexina Xarope Inf ID","Aparelho respiratório","Expectorantes","I"],["33182","Enalapril 10mg Cp ID","Aparelho cardiovascular","Tensão","I"],["33139","Losartan + HCTZ 50+12,5mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33845","Metro + Norfloxacina Susp Oral ID","Medicamentos anti-infecciosos","Antibióticos","I"],["32717","Aciclovir Creme MG","Medicamentos anti-infecciosos","Antivirais","G"],["32837","Paracetamol 500mg Cp ID","Sistema Nervoso Central","Dor e febre","I"],["32756","Ampicilina 250mg Caps ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33321","Quinino 300mg Cp ID","Medicamentos malária","Tratamento malária","I"],["33071","Progesterona 100mg Cp ID","Hormonas e medicamentos usados no tratam","Hormonas","I"],["33831","Dimidon BasiI 400mg cp","Aparelho locomotor","Dor e inflamação","G"],["35034","Cefazolina 1g INJ ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33097","Leopard Inalador","Aparelho respiratório","Descongestionantes","M"],["32767","Amlodipina 10mg Cp MG","Aparelho cardiovascular","Tensão","G"],["32923","Vitamina C 500mg Mastigável ID","Nutrição","Vitaminas e complexo","I"],["35062","Amoxi+Ác. Clavulânico 250mg Susp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["32788","Ampicilina 125mg Susp Oral ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33333","Sildenafil 50mg Cp MG","Aparelho reprodutor","Sexualidade","G"],["33625","Gentocil 3mg/g Pom Oftálmica","Medicamentos usados em afecções oculares","Antibióticos","G"],["33079","Glucosamina 1500mg saq MG","Aparelho locomotor","Dor e inflamação","G"],["33489","Cálcium Comp Eferv MG","Nutrição","Vitaminas e complexo","G"],["33325","Paracetamol + Diclo + caf cp ID","Sistema Nervoso Central","Dor e febre","I"],["32785","Amoxicilina Ampola INJ ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33107","Metformina 850mg cp MG","Hormonas e medicamentos usados no tratam","Diabetes","G"],["33070","Gentamicina Creme ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33413","Anafranil 25mg Cp","Sistema Nervoso Central","Antidepressivo","G"],["33115","Motilium 10mg Cp","Aparelho digestivo","Antiemético","G"],["33135","Losartan 100mg Cp ID","Aparelho cardiovascular","Tensão","I"],["33276","Penicilina 250mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["34215","Enalapril 5mg Cp MG","Aparelho cardiovascular","Tensão","G"],["32866","Bromexina 1,6 Xarope AD MG","Aparelho respiratório","Expectorantes","G"],["33668","Risidon 1000mg Cp","Hormonas e medicamentos usados no tratam","Diabetes","G"],["33217","Cotrimoxazol Forte Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33055","Cetoconazol Champoo ID","Medicamentos anti-infecciosos","Antifúngicos","I"],["32743","Ceftriaxona INJ ID","Medicamentos anti-infecciosos","Antibióticos","I"],["32955","Cloranfenicol 250mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33863","Omeprazol 20mg cp MG","Aparelho digestivo","Protecção gástrica","G"],["32738","Água Oxigenada 250ml","Material gastável","Desinfectantes","M"],["32718","Ácido acetilsalicílico cp 100mg MG","Aparelho cardiovascular","Anticoagulantes","G"],["33552","Depakine 300mg Cp","Sistema Nervoso Central","Antiepiléticos e ant","G"],["32836","Paracetamol 250mg Sup ID","Sistema Nervoso Central","Dor e febre","I"],["33214","Strepfen Pastilhas","Aparelho respiratório","Pastilhas e desinfec","M"],["32789","Anaflam Cp ID","Sistema Nervoso Central","Dor e febre","I"],["32913","Carvedilol 25mg Cp MG","Aparelho cardiovascular","Tensão","G"],["34001","Tetraciclina 500mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["34140","Água Digestiva ID","Nutrição","Re-hidratação","I"],["33843","Vitamina E 200mg Cp ID","Nutrição","Vitaminas e complexo","I"],["33670","Risperidona 1mg Cp MG","Sistema Nervoso Central","Antidepressivo","G"],["33034","Iodopovidona Sol Dérmica","Desinfectantes","Desinfectantes","G"],["34141","Socomol Gel ID","Sistema Nervoso Central","Dor e febre","I"],["34958","Iodopovidona Pomada ID","Desinfectantes","Desinfectantes","I"],["32786","Ampicilina 500mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["34189","Betametasona Creme ID","Medicamentos anti-infecciosos","Antifúngicos","I"],["32998","Ibuprofeno 400mg cp MG","Aparelho locomotor","Dor e inflamação","G"],["34292","Cefalexina 125mg/ml Susp","Medicamentos anti-infecciosos","Antibióticos","G"],["33273","Paracetamol 1000mg Cp MG","Sistema Nervoso Central","Dor e febre","G"],["33016","Eno Sais Tradicionais Saquetas","Aparelho digestivo","Antiácidos","M"],["33291","Butilescopolamina Cp ID","Aparelho digestivo","Anticólicas","I"],["33178","Ciprofloxacina 500mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33122","Levofloxacina 500mg Cp MG","Medicamentos anti-infecciosos","Antibióticos","G"],["34443","Penicilina Pomada ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33038","Janumet 1000+50mg","Hormonas e medicamentos usados no tratam","Diabetes","M"],["34222","Multivitamínico Xarope ID","Nutrição","Apetite","I"],["35031","Indometacina 25mb Cp ID","Aparelho locomotor","Dor e inflamação","I"],["33515","Clopidogrel 75mg cp MG","Aparelho cardiovascular","Anticoagulantes","G"],["32978","Hemoforce Xarope","Sangue","Anemias e gravidez","G"],["34838","Combifrinil 50mg/ml","Medicamentos anti-infecciosos","Desparasitantes","M"],["34188","Ibucap Forte ID","Aparelho locomotor","Dor e inflamação","I"],["32959","Griseofulvina 500mg Cp ID","Medicamentos anti-infecciosos","Antifúngicos","I"],["32812","Bactrim Forte 960mg Cp","Medicamentos anti-infecciosos","Antibióticos","G"],["35060","Neurobion Cp ID","Nutrição","Vitaminas e complexo","I"],["32904","Compressas Gaze Esteril 10x10cm","Material gastável","Curativos","G"],["32799","Azitromicina 500mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33150","Risperidona 2mg Cp MG","Sistema Nervoso Central","Psicotrópicos","G"],["33141","Losartan 50mg Cp MG","Aparelho cardiovascular","Tensão","G"],["32731","Adalat CR 30mg Cp","Aparelho cardiovascular","Tensão","G"],["33039","Lantus sol inj","Hormonas e medicamentos usados no tratam","Diabetes","G"],["33872","Amoxicilina 250mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33207","Nistatina Xarope ID","Medicamentos anti-infecciosos","Antifúngicos","I"],["33279","Pílula SOS 1 Cp ID","Aparelho reprodutor","Contracepção","I"],["34061","Metformina 500mg cp MG","Hormonas e medicamentos usados no tratam","Diabetes","G"],["33414","Anafranil 75mg Cp","Sistema Nervoso Central","Antidepressivo","G"],["32776","Atorvastatina 20mg cp MG","Aparelho cardiovascular","Colesterol","G"],["33829","Dilaclan 125mg/5ml Susp Oral","Medicamentos anti-infecciosos","Antibióticos","G"],["33277","Penicilina 500mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["32817","Bebegel Bisnaga","Aparelho digestivo","Laxantes","G"],["34975","Neomicina Pomada ID","Medicamentos anti-infecciosos","Antifúngicos","I"],["32737","ADT 25MG Cp","Sistema Nervoso Central","Antidepressivo","G"],["33216","Cotrimoxazol Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33688","Brufen 600mg cp","Aparelho locomotor","Dor e inflamação","G"],["32902","Complexo B VelvetMed Xarope","Nutrição","Vitaminas e complexo","G"],["33774","Alfuzosina 10mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33760","Rantudil 60mg","Aparelho locomotor","Dor e inflamação","M"],["34289","Terbinafina 250mg cp MG","Medicamentos anti-infecciosos","Antifúngicos","G"],["33061","Furadantina 100mg Cp","Medicamentos anti-infecciosos","Antibióticos","G"],["32774","Atenolol 50mg Cp MG","Aparelho cardiovascular","Tensão","G"],["32800","Anaflam Xarope Inf ID","Sistema Nervoso Central","Dor e febre","I"],["32728","Álcool Etílico 70%","Material gastável","Desinfectantes","M"],["34290","Voltaren rapid 50mg","Aparelho locomotor","Dor e inflamação","M"],["32773","Atenolol 100mg Cp MG","Aparelho cardiovascular","Tensão","G"],["33898","Ciprofloxacina 500mg Cp MG","Medicamentos anti-infecciosos","Antibióticos","G"],["33175","Sertralina 50mg Cp MG","Sistema Nervoso Central","Antidepressivo","G"],["33307","Voltaren 100mg sup","Aparelho locomotor","Dor e inflamação","M"],["32839","Paracetamol 250mg Susp Oral ID","Sistema Nervoso Central","Dor e febre","I"],["33244","Tramadol 150mg Cp MG","Sistema Nervoso Central","Dor e febre","G"],["32946","Desloratadina 5mg cp MG","Medicação antialérgica","Antialérgicos","G"],["33103","Metronidazol 500mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["33184","Naproxeno 500mg cp MG","Aparelho locomotor","Dor e inflamação","G"],["33130","Loperamida 2mg cp MG","Aparelho digestivo","Diarreia","G"],["33041","Fluditec Xarope Infantil","Aparelho respiratório","Expectorantes","G"],["33484","Buscopan 20mg/ml Amp","Aparelho digestivo","Anticólicas","G"],["33202","Nifedipina 30mg Cp ID","Aparelho cardiovascular","Tensão","I"],["33617","Flagyl 500mg Óvulos Vaginais","Medicamentos anti-infecciosos","Antibióticos","M"],["34747","Vicks Vaporub Pomada","Aparelho respiratório","Antitússicos","G"],["33116","Amoxicilina+Ác. Clav 625mg Cp ID","Medicamentos anti-infecciosos","Antibióticos","I"],["32999","Ibuprofeno 200mg cp MG","Aparelho locomotor","Dor e inflamação","G"],["33337","Tadalafil Bluepharma 20mg cp","Aparelho reprodutor","Sexualidade","G"],["33149","Rinialer cp","Medicação antialérgica","Antialérgicos","G"],["32991","Ibuprofeno 600mg Cp ID","Aparelho locomotor","Dor e inflamação","I"],["33788","Beta-Histina 24mg MG","Sistema Nervoso Central","Antivertiginosos","G"],["32979","Creme Hemorróidas ID","Aparelho digestivo","Tratamento hemorróid","I"],["33264","Ultraproct supositórios","Aparelho digestivo","Tratamento de hemorr","M"],["32977","Hemofissural","Aparelho digestivo","Tratamento hemorróid","M"],["33938","GinoCanesten 100mg","Medicamentos anti-infecciosos","Antifúngicos","M"],["33517","Clotrimazol 10 mg/g cr vag","Medicamentos anti-infecciosos","Antifúngicos","M"],["33493","Canesten 10mg/gr 20gr cr","Medicamentos anti-infecciosos","Antifúngicos","M"],["34014","Gino-Canesten 10mg/mg Cr Vaginal","Medicamentos anti-infecciosos","Antifúngicos","M"],["33518","Clotrimazol 20g Creme MG","Medicamentos anti-infecciosos","Antifúngicos","G"],["33541","Nizoral 20mg/ml Champoo 100ml","Medicamentos anti-infecciosos","Antifúngicos","G"],["33540","Nizoral 20mg/gr 30gr cr","Medicamentos anti-infecciosos","Antifúngicos","M"],["33314","Zentel susp","Medicamentos anti-infecciosos","Desparasitantes","G"],["33313","Zentel 400 mg cp","Medicamentos anti-infecciosos","Desparasitantes","G"],["33224","Albendazol 1cp ID","Medicamentos anti-infecciosos","Desparasitantes","I"],["33642","Pantelmin 100mg Cp","Medicamentos anti-infecciosos","Desparasitantes","G"],["33044","Fluminoc 80+480mg Cp","Medicamentos malária","Tratamento malária","G"],["33043","Fluminoc 20+120mg Cp","Medicamentos malária","Tratamento malária","G"],["32873","Coartem 20+120mg 24Cp","Medicamentos malária","Tratamento malária","G"],["32874","Coartem 80+480 Cp","Medicamentos malária","Tratamento malária","G"],["32872","Coartem 20+120mg 12Cp","Medicamentos malária","Tratamento malária","G"],["33867","Davimether Dispersível ID","Medicamentos malária","Tratamento malária","I"],["33077","Artemether+Lumef 20+120mg Cp Disper ID","Medicamentos malária","Tratamento malária","I"],["33660","Prolif Caps 250mg","Aparelho digestivo","Diarreia","G"],["33260","Ul-250 20saq","Aparelho digestivo","Diarreia","M"],["33452","Microlax Aduldo","Aparelho digestivo","Laxantes","M"],["33580","Dulcolax 5 mg cp","Aparelho digestivo","Laxantes","G"],["33579","Dulcolax 10mg Sup","Aparelho digestivo","Laxantes","M"],["33644","Pepsamar 240mg Cp","Aparelho digestivo","Antiácidos","G"],["33665","Rennie past","Aparelho digestivo","Antiácidos","M"],["33059","Kompensan S 340+30mg cp mastig","Aparelho digestivo","Antiácidos","G"],["34749","Polygel Susp ID","Aparelho digestivo","Antiácidos","I"],["33641","Pankreoflat 170mg+80mg Cp","Aparelho digestivo","Anticólicas","G"],["33385","Aero-om 42mg Cp","Aparelho digestivo","Anticólicas","G"],["33857","Retilyv Pom Rectal","Medicação antialérgica","Antialérgicos","G"],["33875","Trancozema Creme ID","Medicação antialérgica","Antifúngicos","I"],["33133","Loratadina Xarope ID","Medicação antialérgica","Antialérgicos","I"],["34284","Prometazina Susp Oral ID","Medicação antialérgica","Antialérgicos","I"],["32946","Desloratadina 5mg cp MG","Medicação antialérgica","Antialérgicos","G"],["33149","Rinialer cp","Medicação antialérgica","Antialérgicos","G"]];
+
+const CHIPS_LIST = ["Dor de cabeça","Tosse","Diarreia","Malária","Hemorroidas","Alergia","Verminose","Dor muscular","Tensão alta","Candidíase","Gripe","Diabetes"];
+
+function init() {
+  renderChips();
+}
+
+function renderChips() {
+  document.getElementById('chips').innerHTML = CHIPS_LIST.map(s =>
+    `<span class="chip" onclick="useChip('${s}')">${s}</span>`
+  ).join('');
+}
+
+function useChip(v) { document.getElementById('qi').value = v; go(); }
+
+function sw(t) {
+  document.getElementById('busca-panel').style.display = t === 'busca' ? '' : 'none';
+  document.getElementById('sort-panel').style.display = t === 'sort' ? 'block' : 'none';
+  document.getElementById('tb-busca').className = 'tab' + (t === 'busca' ? ' active' : '');
+  document.getElementById('tb-sort').className = 'tab' + (t === 'sort' ? ' active' : '');
+  if (t === 'sort') renderSortTable(SORT);
+}
+
+function renderSortTable(data) {
+  const tipoMap = {M:'Marca', G:'Genérico', I:'Indiano'};
+  const cls = {M:'b-marca', G:'b-gen', I:'b-ind'};
+  const body = document.getElementById('sort-body');
+  body.innerHTML = data.slice(0, 300).map(r => `<tr>
+    <td style="color:#9CA3AF;font-family:'DM Mono',monospace;font-size:11px">${r[0]}</td>
+    <td title="${r[1]}">${r[1]}</td>
+    <td><span class="badge ${cls[r[4]]}">${tipoMap[r[4]]}</span></td>
+    <td title="${r[2]}" style="color:#6B7280">${r[2]}</td>
+  </tr>`).join('') +
+  (data.length > 300 ? `<tr><td colspan="4" style="text-align:center;padding:10px;color:#9CA3AF;font-size:12px">+${data.length-300} mais — filtra para ver</td></tr>` : '');
+}
+
+function filterSort() {
+  const q = document.getElementById('sort-q').value.toLowerCase();
+  renderSortTable(q ? SORT.filter(r => r[1].toLowerCase().includes(q) || r[2].toLowerCase().includes(q) || r[3].toLowerCase().includes(q)) : SORT);
+}
+
+async function go() {
+  const q = document.getElementById('qi').value.trim();
+  if (!q) return;
+  const btn = document.getElementById('btn');
+  btn.disabled = true; btn.textContent = 'A consultar...';
+  document.getElementById('res').innerHTML = `<div class="thinking"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span>IA a analisar o sortimento...</span></div>`;
+
+  const sortTxt = SORT.map(r => `SKU:${r[0]}|${r[1]}|Cat:${r[2]}|Sub:${r[3]}|Tipo:${r[4]==='I'?'Indiano':r[4]==='G'?'Genérico':'Marca'}`).join('\n');
+
+  const prompt = `És um assistente de apoio a vendas de farmácia em Angola. O colaborador no balcão tem um utente com: "${q}".
+
+Sortimento disponível (farmácias Nuvi, Angola):
+${sortTxt}
+
+Responde APENAS em JSON válido sem markdown:
+{"resumo_clinico":"explicação breve da condição para o colaborador (2-3 frases simples)","recomendacoes":[{"sku":"SKU exacto","nome_produto":"nome exacto do produto","justificacao":"porque serve este produto (1 frase)","prioridade":"1ª escolha|alternativa|complementar"}],"alertas":["alerta clínico importante se necessário"],"nao_disponivel":"descrição se nenhum produto do sortimento for adequado"}
+Inclui apenas produtos do sortimento. Máx 4 recomendações. Ordena por prioridade.`;
+
+  try {
+    const resp = await fetch('https://nuvi-farmacia.onrender.com/consultar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    const raw = data.content?.find(b => b.type === 'text')?.text || '';
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+    catch(e) {
+      document.getElementById('res').innerHTML = `<div class="result-card"><pre style="font-size:13px;white-space:pre-wrap">${raw}</pre></div>`;
+      return;
+    }
+    renderRes(q, parsed);
+  } catch(e) {
+    document.getElementById('res').innerHTML = `<div class="result-card"><div class="alert alert-danger">Erro: ${e.message}</div></div>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Consultar IA';
+  }
+}
+
+function renderRes(q, r) {
+  const tipoMap = {M:'Marca', G:'Genérico', I:'Indiano'};
+  const tipoCls = {M:'b-marca', G:'b-gen', I:'b-ind'};
+  let html = `<div class="result-card">
+    <div class="result-query">Consulta: <span>${q}</span></div>`;
+  if (r.resumo_clinico) html += `<div class="ai-note">${r.resumo_clinico}</div>`;
+
+  if (r.recomendacoes?.length) {
+    r.recomendacoes.forEach((rec, i) => {
+      const prod = SORT.find(p => p[0] === String(rec.sku)) ||
+                   SORT.find(p => p[1].toLowerCase().includes((rec.nome_produto||'').toLowerCase().split(' ')[0]));
+      const tc = prod ? tipoCls[prod[4]] : '';
+      const tn = prod ? tipoMap[prod[4]] : '—';
+      const isFirst = i === 0;
+      html += `<div class="prod-card ${isFirst ? 'first' : ''}">
+        <div>
+          <div class="prod-name">${rec.nome_produto}</div>
+          <div class="prod-sku">SKU ${rec.sku || '—'}</div>
+          <div class="badges">
+            <span class="badge ${tc}">${tn}</span>
+            <span class="badge b-prio ${isFirst ? 'first' : ''}">${rec.prioridade || ''}</span>
+          </div>
+          <div class="prod-just">${rec.justificacao || ''}</div>
+        </div>
+        <div style="text-align:right;font-size:11px;color:#9CA3AF;padding-top:2px">${prod ? prod[2] : ''}</div>
+      </div>`;
+    });
+  }
+
+  if (r.nao_disponivel) html += `<div class="alert alert-warn" style="margin-top:10px">Sem produto adequado no sortimento: ${r.nao_disponivel}</div>`;
+  if (r.alertas?.length) r.alertas.forEach(a => { html += `<div class="alert alert-danger" style="margin-top:6px">Alerta: ${a}</div>`; });
+  html += '</div>';
+  document.getElementById('res').innerHTML = html;
+}
+
+init();
+</script>
+</body>
+</html>
