@@ -1,12 +1,14 @@
 const https = require('https');
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.ANTHROPIC_API_KEY || '';
 
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
@@ -15,6 +17,22 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Serve the HTML app
+  if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html')) {
+    const filePath = path.join(__dirname, 'index.html');
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        res.writeHead(500);
+        res.end('Erro ao carregar o app');
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(data);
+    });
+    return;
+  }
+
+  // Proxy API calls
   if (req.method === 'POST' && req.url === '/consultar') {
     let body = '';
     req.on('data', chunk => { body += chunk; });
@@ -66,9 +84,9 @@ const server = http.createServer((req, res) => {
   }
 
   res.writeHead(404);
-  res.end(JSON.stringify({ error: 'Rota não encontrada' }));
+  res.end('Not found');
 });
 
 server.listen(PORT, () => {
-  console.log(`Servidor Nuvi Farmácia a correr na porta ${PORT}`);
+  console.log('Servidor Nuvi Farmácia a correr na porta ' + PORT);
 });
