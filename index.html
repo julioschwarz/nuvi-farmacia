@@ -247,7 +247,22 @@ async function recomendarDireto(){
 }
 
 async function gerarRecomendacao(ctx){
-  const sortTxt=SORT.map(r=>`SKU:${r[0]}|${r[1]}|${r[2]}|${r[4]==='I'?'Indiano':r[4]==='G'?'Genérico':'Marca'}`).join('\n');
+  // Filtra sortimento relevante para reduzir tokens
+  const MEDS_KEYWORDS=['farmaco','medic','anti','para','ibupro','diclof','amox','cipro','metro','lorat','omepra','losart','amlod','atenol','enalapril','captop','sinvast','atorvast','azitro','cotrimox','flucon','clotri','meben','alben','artemeth','coartem','fluminoc','quinin','sulfad','bisaco','loper','ul-250','prolif','soro oral','sais trad','polygel','pepsamar','rennie','buscopan','motilium','metoclop','pankreo','aero','creme hemor','ultraproct','hemofissural','loratad','deslorat','prometer','rinialer','betahistin','salbutamol','bromexina','fluditec','vicks','benylin','xarope tosse','pastilhas','descong','strepfen','ben-u-ron','anaflam','socomol','trifene','nimesulida','piroxicam','dimidon','brufen','voltaren','rantudil','dicolaine','glucosam','naprox','etoricoxib','clonix','moviplus','hirudoid','tramadol','canesten','ginoc','nizoral','cetoconazol','trancozema','griseo','terbinaf','neomicin','canderme','aciclovir','rifampicin','eritromicin','doxiciclin','tetraciclina','ceftriaxona','cefalexin','ampicilina','penicilina','bactrim','flagyl','levofloxacin','norfloxacin','cloranfenicol','amifer','hemoforce','folifer','folicil','acido folico','sulfato fe','yodafar','vitamina','complexo b','multivit','centrum','neurobion','vitanium','viterra','imunavit','sargenor','magnoral','omega','cálcium','zinc','sulfato zinco','c8 forte','c4 cp','c12 forte','nuravit','provital','becozyme','redoxon','corvite','cebiolon','supradyn'];
+  const sintLower=estado.sintoma.toLowerCase();
+  // Always include medicamentos + OTC, filter dermocosmética/puericultura unless relevant
+  const sortFiltrado = SORT.filter(r => {
+    const s = r[1].toLowerCase();
+    const sec = r[2].toLowerCase();
+    // Always include medicamentos e OTC
+    if(sec.includes('medicamento') || sec.includes('otc')) return true;
+    // Include dispositivos médicos e gastáveis
+    if(sec.includes('dispositivo')) return true;
+    // Include outros only if keyword matches
+    if(MEDS_KEYWORDS.some(k => s.includes(k))) return true;
+    return false;
+  });
+  const sortTxt=sortFiltrado.map(r=>`SKU:${r[0]}|${r[1]}|${r[2]}|${r[4]==='I'?'Indiano':r[4]==='G'?'Genérico':'Marca'}`).join('\n');
   const ctxPart=ctx?`Contexto adicional do utente:\n${ctx}\n\n`:'';
   const prompt=`És assistente de vendas da farmácia +Saúde em Angola.
 Sintoma/condição: "${estado.sintoma}"
