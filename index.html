@@ -56,57 +56,40 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .context-pill{padding:3px 10px;background:var(--pink-light);color:var(--pink-dark);border-radius:10px;font-size:11px;font-weight:500}
 
 /* GRUPO TERAPÊUTICO */
-.grupo{margin-bottom:16px}
-.grupo-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.grupo-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);background:var(--bg);padding:3px 10px;border-radius:10px;border:1px solid var(--border-strong)}
-.grupo-label.antibiotico{background:#FEE2E2;color:#7F1D1D;border-color:#FECACA}
-.grupo-label.acessorio{background:#FEF3C7;color:#78350F;border-color:#FDE68A}
-.grupo-label.principal{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-muted)}
-
-/* ALERTA RECEITA */
-.receita-alert{display:flex;align-items:center;gap:8px;background:#FEE2E2;border:1.5px solid #FECACA;border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:10px;font-size:13px;font-weight:600;color:#7F1D1D}
-.receita-icon{width:18px;height:18px;background:#EF4444;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:white;font-size:11px;font-weight:700}
-
-/* PRODUTO */
-.prod-card{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-top:6px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;transition:border-color .12s}
-.prod-card:hover{border-color:var(--teal-muted)}
-.prod-card.first{border-color:var(--teal);background:#FAFFFE}
-.prod-card.acessorio-card{border-color:#FDE68A;background:#FFFEF5}
-.prod-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
-.prod-sku{font-size:11px;color:var(--text-light);font-family:'DM Mono',monospace;margin-bottom:6px}
-.prod-just{font-size:13px;color:var(--text-muted);line-height:1.5;margin-top:6px}
-.badges{display:flex;gap:5px;flex-wrap:wrap}
-.badge{font-size:11px;font-weight:500;padding:2px 9px;border-radius:10px;display:inline-block}
+/* COLUNAS TERAPÊUTICAS */
+.grupos-grid{display:grid;gap:10px;margin-bottom:12px}
+.grupo-col{border:0.5px solid var(--border-strong);border-radius:var(--radius-sm);overflow:hidden;display:flex;flex-direction:column}
+.col-header{padding:9px 12px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;display:flex;align-items:center;gap:6px}
+.col-header.principal{background:var(--teal-light);color:var(--teal-dark)}
+.col-header.antibiotico{background:#FEE2E2;color:#7F1D1D}
+.receita-bar{background:#FEE2E2;border-bottom:0.5px solid #FECACA;padding:6px 10px;display:flex;align-items:center;gap:6px}
+.rx-badge{background:#EF4444;color:white;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;flex-shrink:0}
+.rx-text{font-size:11px;color:#7F1D1D;font-weight:500}
+.prod-card{padding:10px 12px;border-bottom:0.5px solid var(--border);background:var(--color-background-primary)}
+.prod-card:last-child{border-bottom:none}
+.prod-card.first{background:#FAFFFE;border-left:3px solid var(--teal)}
+.prod-card.first-rx{background:#FFF8F8;border-left:3px solid #EF4444}
+.prod-name{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.prod-sku{font-size:10.5px;color:var(--color-text-secondary);font-family:'DM Mono',monospace;margin-bottom:5px;opacity:.7}
+.prod-just{font-size:11.5px;color:var(--color-text-secondary);line-height:1.45;margin-top:5px}
+.badges{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:4px}
+.badge{font-size:10px;font-weight:500;padding:1px 8px;border-radius:8px;display:inline-block}
 .b-marca{background:#EFF6FF;color:#1E40AF}
 .b-gen{background:#F0FDF4;color:#166534}
 .b-ind{background:#FFFBEB;color:#78350F}
-.b-prio{background:transparent;border:1.5px solid var(--border-strong);color:var(--text-muted)}
-.b-prio.first{border-color:var(--teal);color:var(--teal-dark)}
-.prod-cat{font-size:11px;color:var(--text-light);text-align:right;padding-top:2px}
-
+.b-prio{border:0.5px solid var(--border-strong);color:var(--text-muted)}
+.b-prio-top{border:0.5px solid var(--teal);color:var(--teal-dark)}
 .alert{padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-top:8px;line-height:1.5}
-.alert-warn{background:#FEF3C7;color:#78350F}
-.alert-danger{background:#FEE2E2;color:#7F1D1D}
-
-/* SEPARADOR ACESSÓRIOS */
-.acessorios-sep{display:flex;align-items:center;gap:10px;margin:18px 0 10px}
-.acessorios-sep-line{flex:1;height:1px;background:var(--border-strong)}
-.acessorios-sep-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#78350F;background:#FEF3C7;padding:4px 12px;border-radius:20px;white-space:nowrap}
-
-/* SORTIMENTO */
-.sort-panel{display:none}
-.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;text-align:center}
-.stat-val{font-size:24px;font-weight:700;color:var(--teal)}
-.stat-lbl{font-size:12px;color:var(--text-muted);margin-top:3px}
-.sort-filter{width:100%;padding:10px 14px;border:1.5px solid var(--border-strong);border-radius:var(--radius-sm);font-size:14px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);margin-bottom:10px}
-.sort-filter:focus{outline:none;border-color:var(--teal)}
-.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-height:500px;overflow-y:auto}
-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
-th{text-align:left;padding:10px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0}
-td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--bg)}
+.alert-warn{background:#FEF3C7;color:#78350F}.alert-danger{background:#FEE2E2;color:#7F1D1D}
+.acess-section{border:0.5px solid #FAC775;border-radius:var(--radius-sm);overflow:hidden;margin-top:4px}
+.acess-header{background:#FAEEDA;padding:8px 14px;display:flex;align-items:center;gap:8px}
+.acess-header-txt{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:#633806}
+.acess-header-sub{font-size:11px;color:#854F0B;margin-left:auto;font-style:italic}
+.acess-cards{display:grid;gap:0}
+.acess-card{padding:10px 14px;border-bottom:0.5px solid #FAC775;border-right:0.5px solid #FAC775;background:var(--color-background-primary)}
+.acess-card:last-child{border-bottom:none;border-right:none}
+.acess-name{font-size:12.5px;font-weight:500;color:var(--color-text-primary);margin-bottom:3px}
+.acess-just{font-size:11px;color:var(--color-text-secondary);line-height:1.4}
 @media(max-width:600px){.stats-row{grid-template-columns:1fr 1fr}.topbar-badge{display:none}.search-btn{padding:12px 14px;font-size:13px}}
 </style>
 </head>
@@ -330,56 +313,37 @@ Responde APENAS em JSON válido sem markdown, sem aspas simples, sem comentário
 function renderResultado(r){
   const tm={Marca:'b-marca',Genérico:'b-gen',Indiano:'b-ind'};
   const pills=estado.perguntas.map(p=>estado.respostas[p.id]&&!estado.respostas[p.id].includes('Não sei')?`<span class="context-pill">${estado.respostas[p.id]}</span>`:'').join('');
-
-  let html=`<div class="result-card">
-    <div class="result-header">
-      <div><div class="result-query-label">Consulta</div><div class="result-query-val">${estado.sintoma}</div></div>
-      <button class="nova-btn" onclick="novaConsulta()">Nova consulta</button>
-    </div>`;
-
+  let html=`<div class="result-card"><div class="result-header"><div><div class="result-query-label">Consulta</div><div class="result-query-val">${estado.sintoma}</div></div><button class="nova-btn" onclick="novaConsulta()">Nova consulta</button></div>`;
   if(pills) html+=`<div class="context-pills">${pills}</div>`;
   if(r.resumo_clinico) html+=`<div class="ai-note">${r.resumo_clinico}</div>`;
 
-  // GRUPOS TERAPÊUTICOS
   if(r.grupos?.length){
+    const n=r.grupos.length;
+    const minCol=n<=2?'260px':n===3?'180px':n===4?'160px':'140px';
+    html+=`<div class="grupos-grid" style="grid-template-columns:repeat(auto-fit,minmax(${minCol},1fr))">`;
     r.grupos.forEach(g=>{
       const isAnti=g.require_receita;
-      const labelCls=isAnti?'antibiotico':'principal';
-      html+=`<div class="grupo"><div class="grupo-header"><span class="grupo-label ${labelCls}">${g.categoria}</span></div>`;
-      if(isAnti){
-        html+=`<div class="receita-alert"><div class="receita-icon">Rx</div>Venda sujeita a receita médica obrigatória</div>`;
-      }
-      const sorted=sortProdutos(g.produtos||[]);
-      sorted.forEach((p,i)=>{
+      html+=`<div class="grupo-col"><div class="col-header ${isAnti?'antibiotico':'principal'}">${g.categoria}</div>`;
+      if(isAnti) html+=`<div class="receita-bar"><span class="rx-badge">Rx</span><span class="rx-text">Receita médica obrigatória</span></div>`;
+      sortProdutos(g.produtos||[]).forEach((p,i)=>{
         const tc=tm[p.tipo]||'';
-        html+=`<div class="prod-card ${i===0?'first':''}">
-          <div>
-            <div class="prod-name">${p.nome_produto}</div>
-            <div class="prod-sku">SKU ${p.sku||'—'}</div>
-            <div class="badges"><span class="badge ${tc}">${p.tipo||'—'}</span>${i===0?'<span class="badge b-prio first">1ª escolha</span>':''}</div>
-            <div class="prod-just">${p.justificacao||''}</div>
-          </div>
-        </div>`;
+        const fc=i===0?(isAnti?'first-rx':'first'):'';
+        html+=`<div class="prod-card ${fc}"><div class="prod-name">${p.nome_produto}</div><div class="prod-sku">SKU ${p.sku||'—'}</div><div class="badges"><span class="badge ${tc}">${p.tipo||'—'}</span><span class="badge ${i===0?'b-prio-top':'b-prio'}">${i===0?'1ª escolha':'Alternativa'}</span></div><div class="prod-just">${p.justificacao||''}</div></div>`;
       });
       html+=`</div>`;
     });
+    html+=`</div>`;
   }
 
-  // VENDAS ACESSÓRIAS
   if(r.vendas_acessorias?.length){
-    html+=`<div class="acessorios-sep"><div class="acessorios-sep-line"></div><div class="acessorios-sep-label">Venda acessória sugerida</div><div class="acessorios-sep-line"></div></div>`;
     const sortedAc=sortProdutos(r.vendas_acessorias);
+    const ac2=sortedAc.length===1?'1fr':'1fr 1fr';
+    html+=`<div class="acess-section"><div class="acess-header"><span class="acess-header-txt">Venda acessória sugerida</span><span class="acess-header-sub">Ofereça sempre estes complementos</span></div><div class="acess-cards" style="grid-template-columns:${ac2}">`;
     sortedAc.forEach(p=>{
       const tc=tm[p.tipo]||'';
-      html+=`<div class="prod-card acessorio-card">
-        <div>
-          <div class="prod-name">${p.nome_produto}</div>
-          <div class="prod-sku">SKU ${p.sku||'—'}</div>
-          <div class="badges"><span class="badge ${tc}">${p.tipo||'—'}</span><span class="badge" style="background:#FEF3C7;color:#78350F;border:1px solid #FDE68A">Acessório</span></div>
-          <div class="prod-just">${p.justificacao||''}</div>
-        </div>
-      </div>`;
+      html+=`<div class="acess-card"><div class="badges"><span class="badge ${tc}">${p.tipo||'—'}</span></div><div class="acess-name">${p.nome_produto}</div><div class="prod-sku">SKU ${p.sku||'—'}</div><div class="acess-just">${p.justificacao||''}</div></div>`;
     });
+    html+=`</div></div>`;
   }
 
   if(r.alertas?.length) r.alertas.forEach(a=>{html+=`<div class="alert alert-danger" style="margin-top:8px">Alerta: ${a}</div>`;});
