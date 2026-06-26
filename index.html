@@ -234,99 +234,99 @@ async function gerarRecomendacao(ctx){
   const MAPA = {
     'dor de cabeça': {
       grupos: [
-        {cat:'Analgésico / Antipirético', rx:false},
-        {cat:'Anti-inflamatório', rx:false}
+        {cat:'Analgésico / Antipirético', rx:false, hint:'Paracetamol, Dipirona, Ben-u-ron. Para dor e febre. NÃO incluir anti-inflamatórios como Ibuprofeno ou Diclofenac.'},
+        {cat:'Anti-inflamatório', rx:false, hint:'Ibuprofeno, Diclofenac, Nimesulida, Voltaren. NÃO incluir analgésicos simples como Paracetamol.'}
       ],
       acessorios: []
     },
     'tosse': {
       grupos: [
-        {cat:'Expectorante / Antitússico', rx:false},
-        {cat:'Descongestionante nasal', rx:false},
-        {cat:'Pastilhas de garganta', rx:false}
+        {cat:'Expectorante / Antitússico', rx:false, hint:'Xaropes expectorantes ou antitússicos como Bromexina, Ambroxol, Fluditec, Vicks. NÃO incluir antibióticos nem anti-inflamatórios.'},
+        {cat:'Descongestionante nasal', rx:false, hint:'Gotas ou sprays nasais descongestionantes. NÃO incluir xaropes de tosse.'},
+        {cat:'Pastilhas de garganta', rx:false, hint:'Pastilhas para alívio da garganta como Strepfen, pastilhas de mel. NÃO incluir comprimidos sistémicos.'}
       ],
       acessorios: ['Vitamina C']
     },
     'diarreia': {
       grupos: [
-        {cat:'Antidiarreico', rx:false},
-        {cat:'Reidratação oral', rx:false},
-        {cat:'Protetor intestinal', rx:false},
-        {cat:'Antibiótico (se infecção bacteriana confirmada)', rx:true}
+        {cat:'Antidiarreico', rx:false, hint:'Loperamida ou similar — reduz motilidade intestinal. NÃO incluir antiácidos, protetores gástricos nem soros injectáveis.'},
+        {cat:'Reidratação oral', rx:false, hint:'Apenas sais de reidratação oral (Soro Oral, Sais Tradicionais, Pedialyte). NÃO incluir Eno, antiácidos, digestivos nem soros injectáveis (Lactato Ringer, Cloreto Sódio).'},
+        {cat:'Protetor intestinal', rx:false, hint:'Produtos que protegem a mucosa intestinal como Smecta, Ulcermin ou similares. NÃO incluir antiácidos (Eno, Kompensan, Rennie), soros injectáveis nem laxantes.'},
+        {cat:'Antibiótico (se infecção bacteriana confirmada)', rx:true, hint:'Metronidazol, Ciprofloxacina ou similar. Apenas se suspeita bacteriana. Requer receita.'}
       ],
       acessorios: ['Complexo B']
     },
     'malária': {
       grupos: [
-        {cat:'Antimalárico', rx:false},
-        {cat:'Antipirético', rx:false}
+        {cat:'Antimalárico', rx:false, hint:'Coartem, Fluminoc, Artemether+Lumefantrina, Sulfadoxina+Pirimetamina, Quinino. NÃO incluir antibióticos gerais.'},
+        {cat:'Antipirético', rx:false, hint:'Paracetamol ou Ibuprofeno para baixar a febre. NÃO incluir antimaláricos nesta categoria.'}
       ],
       acessorios: ['Complexo B']
     },
     'hemorroidas': {
       grupos: [
-        {cat:'Tratamento tópico hemorróidas (creme/supositório)', rx:false},
-        {cat:'Venotónico oral', rx:false},
-        {cat:'Laxante suave', rx:false}
+        {cat:'Tratamento tópico hemorróidas', rx:false, hint:'Cremes ou supositórios para hemorróidas: Ultraproct, Hemofissural, Creme Hemorróidas ID, Retilyv. NÃO incluir outros cremes ou pomadas.'},
+        {cat:'Venotónico oral', rx:false, hint:'Diosmin, Trifene. Comprimidos venotónicos para hemorróidas. NÃO incluir laxantes.'},
+        {cat:'Laxante suave', rx:false, hint:'Dulcolax, Bebegel, Microlax. Laxantes suaves. NÃO incluir anti-inflamatórios nem venotónicos.'}
       ],
       acessorios: []
     },
     'alergia': {
       grupos: [
-        {cat:'Antialérgico oral', rx:false},
-        {cat:'Descongestionante nasal', rx:false}
+        {cat:'Antialérgico oral', rx:false, hint:'Loratadina, Desloratadina, Cetirizina, Rinialer, Prometazina. NÃO incluir corticóides nem antibióticos.'},
+        {cat:'Descongestionante nasal', rx:false, hint:'Gotas nasais descongestionantes. NÃO incluir anti-histamínicos orais.'}
       ],
       acessorios: ['Soro nasal / Higiene nasal']
     },
     'verminose': {
       grupos: [
-        {cat:'Desparasitante', rx:false}
+        {cat:'Desparasitante', rx:false, hint:'Mebendazol, Albendazol, Zentel, Pantelmin, Combifrinil. NÃO incluir antibióticos nem antiprotozoários.'}
       ],
       acessorios: ['Complexo B']
     },
     'dor muscular': {
       grupos: [
-        {cat:'Anti-inflamatório oral', rx:false},
-        {cat:'Analgésico', rx:false},
-        {cat:'Bálsamo / Gel tópico analgésico', rx:false}
+        {cat:'Anti-inflamatório oral', rx:false, hint:'Ibuprofeno, Diclofenac, Nimesulida, Naproxeno. NÃO incluir apenas analgésicos como paracetamol.'},
+        {cat:'Analgésico', rx:false, hint:'Paracetamol, Dipirona para alívio da dor. NÃO incluir anti-inflamatórios desta categoria.'},
+        {cat:'Bálsamo / Gel tópico analgésico', rx:false, hint:'Géis ou pomadas de aplicação local: Voltaren gel, Diclofenac gel, Dicolaine. NÃO incluir comprimidos.'}
       ],
       acessorios: ['Suplemento articular / Glucosamina']
     },
     'tensão alta': {
       grupos: [
-        {cat:'Anti-hipertensivo', rx:false},
-        {cat:'Diurético', rx:false}
+        {cat:'Anti-hipertensivo', rx:false, hint:'Amlodipina, Losartan, Enalapril, Captopril, Atenolol, Valsartan. NÃO incluir diuréticos nesta categoria.'},
+        {cat:'Diurético', rx:false, hint:'Hidroclorotiazida, Furosemida, Indapamida. NÃO incluir anti-hipertensivos nesta categoria.'}
       ],
       acessorios: ['Tensiómetro']
     },
     'candidíase': {
       grupos: [
-        {cat:'Antifúngico tópico (creme vaginal)', rx:false},
-        {cat:'Antifúngico oral', rx:false}
+        {cat:'Antifúngico tópico (creme vaginal)', rx:false, hint:'Cremes vaginais: Canesten, Clotrimazol creme, GinoCanesten. NÃO incluir comprimidos orais.'},
+        {cat:'Antifúngico oral', rx:false, hint:'Comprimidos orais: Fluconazol 150mg. NÃO incluir cremes tópicos.'}
       ],
       acessorios: ['Gel higiene íntima']
     },
     'gripe': {
       grupos: [
-        {cat:'Antipirético / Antigripal', rx:false},
-        {cat:'Descongestionante nasal', rx:false},
-        {cat:'Expectorante', rx:false}
+        {cat:'Antipirético / Antigripal', rx:false, hint:'Paracetamol, Antigripal cp, Anaflam. NÃO incluir antibióticos.'},
+        {cat:'Descongestionante nasal', rx:false, hint:'Gotas ou sprays nasais descongestionantes. NÃO incluir xaropes.'},
+        {cat:'Expectorante', rx:false, hint:'Bromexina, Ambroxol, Fluditec. NÃO incluir descongestionantes nasais.'}
       ],
       acessorios: ['Vitamina C', 'Complexo B']
     },
     'diabetes': {
       grupos: [
-        {cat:'Antidiabético oral', rx:false},
-        {cat:'Insulina / Injectável', rx:false}
+        {cat:'Antidiabético oral', rx:false, hint:'Metformina, Glibenclamida, Gliclazida, Janumet, Risidon. NÃO incluir insulinas.'},
+        {cat:'Insulina / Injectável', rx:false, hint:'Lantus, insulina injectável. NÃO incluir comprimidos orais.'}
       ],
       acessorios: ['Glucómetro']
     },
     'garganta infeccionada e febre': {
       grupos: [
-        {cat:'Antipirético', rx:false},
-        {cat:'Anti-inflamatório', rx:false},
-        {cat:'Pastilhas de garganta', rx:false},
-        {cat:'Antibiótico (se infecção bacteriana)', rx:true}
+        {cat:'Antipirético', rx:false, hint:'Paracetamol, Ben-u-ron. Para baixar febre. NÃO incluir anti-inflamatórios nesta categoria.'},
+        {cat:'Anti-inflamatório', rx:false, hint:'Ibuprofeno, Diclofenac, Nimesulida. Para a inflamação da garganta. NÃO incluir antipiréticos simples.'},
+        {cat:'Pastilhas de garganta', rx:false, hint:'Strepfen pastilhas. Alívio local.'},
+        {cat:'Antibiótico (se infecção bacteriana)', rx:true, hint:'Amoxicilina+Clavulánico, Azitromicina, Eritromicina. Requer receita médica.'}
       ],
       acessorios: ['Vitamina C']
     }
@@ -350,7 +350,7 @@ async function gerarRecomendacao(ctx){
 
   if(mapeamento){
     // Sintoma reconhecido — usa categorias pré-definidas
-    const gruposStr = mapeamento.grupos.map((g,i)=>`${i+1}. "${g.cat}"${g.rx?' (REQUER RECEITA MÉDICA)':''}`).join('\n');
+    const gruposStr = mapeamento.grupos.map((g,i)=>`${i+1}. "${g.cat}"${g.rx?' (REQUER RECEITA MÉDICA)':''} ${g.hint?'— Instrução: '+g.hint:''}`).join('\n');
     const acessStr = mapeamento.acessorios.length
       ? `Vendas acessórias a sugerir (encontra no sortimento produtos desta categoria): ${mapeamento.acessorios.join(', ')}`
       : 'Sem vendas acessórias para este caso.';
