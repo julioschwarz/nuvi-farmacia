@@ -230,77 +230,193 @@ async function recomendarDireto(){
 }
 
 async function gerarRecomendacao(ctx){
-  // Filtra sortimento relevante para reduzir tokens
-  const MEDS_KEYWORDS=['farmaco','medic','anti','para','ibupro','diclof','amox','cipro','metro','lorat','omepra','losart','amlod','atenol','enalapril','captop','sinvast','atorvast','azitro','cotrimox','flucon','clotri','meben','alben','artemeth','coartem','fluminoc','quinin','sulfad','bisaco','loper','ul-250','prolif','soro oral','sais trad','polygel','pepsamar','rennie','buscopan','motilium','metoclop','pankreo','aero','creme hemor','ultraproct','hemofissural','loratad','deslorat','prometer','rinialer','betahistin','salbutamol','bromexina','fluditec','vicks','benylin','xarope tosse','pastilhas','descong','strepfen','ben-u-ron','anaflam','socomol','trifene','nimesulida','piroxicam','dimidon','brufen','voltaren','rantudil','dicolaine','glucosam','naprox','etoricoxib','clonix','moviplus','hirudoid','tramadol','canesten','ginoc','nizoral','cetoconazol','trancozema','griseo','terbinaf','neomicin','canderme','aciclovir','rifampicin','eritromicin','doxiciclin','tetraciclina','ceftriaxona','cefalexin','ampicilina','penicilina','bactrim','flagyl','levofloxacin','norfloxacin','cloranfenicol','amifer','hemoforce','folifer','folicil','acido folico','sulfato fe','yodafar','vitamina','complexo b','multivit','centrum','neurobion','vitanium','viterra','imunavit','sargenor','magnoral','omega','cálcium','zinc','sulfato zinco','c8 forte','c4 cp','c12 forte','nuravit','provital','becozyme','redoxon','corvite','cebiolon','supradyn'];
-  const sintLower=estado.sintoma.toLowerCase();
-  // Always include medicamentos + OTC, filter dermocosmética/puericultura unless relevant
+  // Mapeamento fixo de sintomas conhecidos → categorias terapêuticas
+  const MAPA = {
+    'dor de cabeça': {
+      grupos: [
+        {cat:'Analgésico / Antipirético', rx:false},
+        {cat:'Anti-inflamatório', rx:false}
+      ],
+      acessorios: []
+    },
+    'tosse': {
+      grupos: [
+        {cat:'Expectorante / Antitússico', rx:false},
+        {cat:'Descongestionante nasal', rx:false},
+        {cat:'Pastilhas de garganta', rx:false}
+      ],
+      acessorios: ['Vitamina C']
+    },
+    'diarreia': {
+      grupos: [
+        {cat:'Antidiarreico', rx:false},
+        {cat:'Reidratação oral', rx:false},
+        {cat:'Protetor intestinal', rx:false},
+        {cat:'Antibiótico (se infecção bacteriana confirmada)', rx:true}
+      ],
+      acessorios: ['Complexo B']
+    },
+    'malária': {
+      grupos: [
+        {cat:'Antimalárico', rx:false},
+        {cat:'Antipirético', rx:false}
+      ],
+      acessorios: ['Complexo B']
+    },
+    'hemorroidas': {
+      grupos: [
+        {cat:'Tratamento tópico hemorróidas (creme/supositório)', rx:false},
+        {cat:'Venotónico oral', rx:false},
+        {cat:'Laxante suave', rx:false}
+      ],
+      acessorios: []
+    },
+    'alergia': {
+      grupos: [
+        {cat:'Antialérgico oral', rx:false},
+        {cat:'Descongestionante nasal', rx:false}
+      ],
+      acessorios: ['Soro nasal / Higiene nasal']
+    },
+    'verminose': {
+      grupos: [
+        {cat:'Desparasitante', rx:false}
+      ],
+      acessorios: ['Complexo B']
+    },
+    'dor muscular': {
+      grupos: [
+        {cat:'Anti-inflamatório oral', rx:false},
+        {cat:'Analgésico', rx:false},
+        {cat:'Bálsamo / Gel tópico analgésico', rx:false}
+      ],
+      acessorios: ['Suplemento articular / Glucosamina']
+    },
+    'tensão alta': {
+      grupos: [
+        {cat:'Anti-hipertensivo', rx:false},
+        {cat:'Diurético', rx:false}
+      ],
+      acessorios: ['Tensiómetro']
+    },
+    'candidíase': {
+      grupos: [
+        {cat:'Antifúngico tópico (creme vaginal)', rx:false},
+        {cat:'Antifúngico oral', rx:false}
+      ],
+      acessorios: ['Gel higiene íntima']
+    },
+    'gripe': {
+      grupos: [
+        {cat:'Antipirético / Antigripal', rx:false},
+        {cat:'Descongestionante nasal', rx:false},
+        {cat:'Expectorante', rx:false}
+      ],
+      acessorios: ['Vitamina C', 'Complexo B']
+    },
+    'diabetes': {
+      grupos: [
+        {cat:'Antidiabético oral', rx:false},
+        {cat:'Insulina / Injectável', rx:false}
+      ],
+      acessorios: ['Glucómetro']
+    },
+    'garganta infeccionada e febre': {
+      grupos: [
+        {cat:'Antipirético', rx:false},
+        {cat:'Anti-inflamatório', rx:false},
+        {cat:'Pastilhas de garganta', rx:false},
+        {cat:'Antibiótico (se infecção bacteriana)', rx:true}
+      ],
+      acessorios: ['Vitamina C']
+    }
+  };
+
+  const sintLower = estado.sintoma.toLowerCase().trim();
+  const mapeamento = MAPA[sintLower];
+
   const sortFiltrado = SORT.filter(r => {
-    const s = r[1].toLowerCase();
     const sec = r[2].toLowerCase();
-    // Always include medicamentos e OTC
     if(sec.includes('medicamento') || sec.includes('otc')) return true;
-    // Include dispositivos médicos e gastáveis
     if(sec.includes('dispositivo')) return true;
-    // Include outros only if keyword matches
-    if(MEDS_KEYWORDS.some(k => s.includes(k))) return true;
+    const s = r[1].toLowerCase();
+    const MEDS_KEYWORDS=['vitamina','complexo b','suplemento','glucosam','neurobion','tensiomet','glucomet','soro nasal','gel higiene','higiene intima'];
+    if(MEDS_KEYWORDS.some(k=>s.includes(k))) return true;
     return false;
   });
-  const sortTxt=sortFiltrado.map(r=>`SKU:${r[0]}|${r[1]}|${r[2]}|${r[4]==='I'?'Indiano':r[4]==='G'?'Genérico':'Marca'}`).join('\n');
-  const ctxPart=ctx?`Contexto adicional do utente:\n${ctx}\n\n`:'';
-  const prompt=`És assistente de vendas da farmácia +Saúde em Angola.
-Sintoma/condição: "${estado.sintoma}"
-${ctxPart}Sortimento disponível:
+  const sortTxt = sortFiltrado.map(r=>`SKU:${r[0]}|${r[1]}|${r[2]}|${r[4]==='I'?'Indiano':r[4]==='G'?'Genérico':'Marca'}`).join('\n');
+
+  let prompt;
+
+  if(mapeamento){
+    // Sintoma reconhecido — usa categorias pré-definidas
+    const gruposStr = mapeamento.grupos.map((g,i)=>`${i+1}. "${g.cat}"${g.rx?' (REQUER RECEITA MÉDICA)':''}`).join('\n');
+    const acessStr = mapeamento.acessorios.length
+      ? `Vendas acessórias a sugerir (encontra no sortimento produtos desta categoria): ${mapeamento.acessorios.join(', ')}`
+      : 'Sem vendas acessórias para este caso.';
+
+    const ctxPart = ctx ? `Contexto adicional do utente:\n${ctx}\n\n` : '';
+
+    prompt = `És assistente de vendas da farmácia +Saúde em Angola.
+Sintoma: "${estado.sintoma}"
+${ctxPart}
+As categorias terapêuticas para este sintoma são EXACTAMENTE estas, por esta ordem:
+${gruposStr}
+
+REGRAS OBRIGATÓRIAS:
+- Usa APENAS estas categorias, sem adicionar outras
+- Para cada categoria, encontra no sortimento os produtos mais adequados (máx 3 por categoria)
+- Ordena dentro de cada categoria: Marca primeiro, depois Genérico, depois Indiano
+- Não sugeres produtos de categorias adjacentes ou de suporte geral que não estejam listadas
+- ${acessStr}
+
+Sortimento disponível:
 ${sortTxt}
 
-INSTRUÇÕES IMPORTANTES:
-1. Agrupa as recomendações por categoria terapêutica (ex: Analgésico/Antipirético, Anti-inflamatório, Antibiótico, Antitússico, etc.)
-2. Para cada categoria, sugere o produto mais adequado. Dentro de cada categoria, ordena: Marca primeiro, Genérico segundo, Indiano por último
-3. Se alguma categoria contém ANTIBIÓTICOS, marca obrigatoriamente com require_receita:true
-4. Inclui uma secção separada de "vendas_acessorias" com 1-2 produtos complementares do sortimento que façam sentido para aumentar a venda (vitaminas, suplementos, produtos de higiene relacionados, etc.)
-5. Usa apenas produtos do sortimento fornecido
+Responde APENAS em JSON válido sem markdown, sem aspas simples, sem trailing commas:
+{"resumo_clinico":"explicação breve para o colaborador (2 frases)","grupos":[{"categoria":"nome exacto da categoria","require_receita":false,"produtos":[{"sku":"SKU exacto","nome_produto":"nome exacto","justificacao":"1 frase directa","tipo":"Marca|Genérico|Indiano"}]}],"vendas_acessorias":[{"sku":"SKU exacto","nome_produto":"nome exacto","justificacao":"1 frase","tipo":"Marca|Genérico|Indiano"}],"alertas":[]}`;
 
-Responde APENAS em JSON válido sem markdown, sem aspas simples, sem comentários, sem trailing commas:
-{
-  "resumo_clinico": "explicação breve para o colaborador",
-  "grupos": [
-    {
-      "categoria": "nome da categoria terapêutica",
-      "require_receita": false,
-      "produtos": [
-        {"sku":"SKU exacto","nome_produto":"nome exacto","justificacao":"1 frase","tipo":"Marca|Genérico|Indiano"}
-      ]
-    }
-  ],
-  "vendas_acessorias": [
-    {"sku":"SKU exacto","nome_produto":"nome exacto","justificacao":"porque faz sentido oferecer (1 frase)","tipo":"Marca|Genérico|Indiano"}
-  ],
-  "alertas": ["alerta clínico se necessário"]
-}`;
+  } else {
+    // Sintoma livre — IA decide as categorias mas com prompt restritivo
+    const ctxPart = ctx ? `Contexto adicional do utente:\n${ctx}\n\n` : '';
+
+    prompt = `És assistente de vendas da farmácia +Saúde em Angola.
+Sintoma/condição: "${estado.sintoma}"
+${ctxPart}
+REGRAS OBRIGATÓRIAS:
+- Sugere APENAS categorias terapêuticas directamente indicadas para este sintoma específico
+- NÃO sugeres vitaminas gerais, suplementos ou produtos de suporte a não ser que sejam clinicamente relevantes para este caso
+- NÃO sugeres antiácidos, protetores gástricos ou outros produtos de categorias não relacionadas
+- Para antibióticos, marca sempre require_receita:true
+- Ordena dentro de cada categoria: Marca primeiro, depois Genérico, depois Indiano
+- Máx 4 grupos terapêuticos, máx 3 produtos por grupo
+- Para vendas_acessorias: apenas 1-2 produtos claramente complementares e óbvios para este caso
+
+Sortimento disponível:
+${sortTxt}
+
+Responde APENAS em JSON válido sem markdown, sem aspas simples, sem trailing commas:
+{"resumo_clinico":"explicação breve para o colaborador (2 frases)","grupos":[{"categoria":"nome da categoria","require_receita":false,"produtos":[{"sku":"SKU exacto","nome_produto":"nome exacto","justificacao":"1 frase directa","tipo":"Marca|Genérico|Indiano"}]}],"vendas_acessorias":[{"sku":"SKU exacto","nome_produto":"nome exacto","justificacao":"1 frase","tipo":"Marca|Genérico|Indiano"}],"alertas":[]}`;
+  }
 
   try{
     const data=await chamarAPI([{role:'user',content:prompt}]);
     const raw=data.content?.find(b=>b.type==='text')?.text||'';
     const cleaned=raw.replace(/```json|```/g,'').trim();
     let parsed;
-    try{
-      parsed=JSON.parse(cleaned);
-    }catch(e1){
-      // Try to extract JSON object even if malformed
+    try{parsed=JSON.parse(cleaned);}
+    catch(e1){
       const match=cleaned.match(/\{[\s\S]*\}/);
       if(match){
         try{
-          // Fix common issues: trailing commas, single quotes
-          const fixed=match[0]
-            .replace(/,\s*([}\]])/g,'$1')
-            .replace(/([{,]\s*)'([^']+)'\s*:/g,'$1"$2":')
-            .replace(/:\s*'([^']*)'/g,':"$1"');
+          const fixed=match[0].replace(/,\s*([}\]])/g,'$1');
           parsed=JSON.parse(fixed);
         }catch(e2){
-          document.getElementById('res').innerHTML=`<div class="result-card"><div class="alert alert-danger">Erro JSON. Resposta da IA:</div><pre style="font-size:11px;overflow:auto;white-space:pre-wrap;margin-top:8px;padding:8px;background:#f5f5f5;border-radius:6px">${cleaned.substring(0,2000)}</pre></div>`;
+          document.getElementById('res').innerHTML=`<div class="result-card"><div class="alert alert-danger">Erro ao interpretar resposta. Tente novamente.</div></div>`;
           return;
         }
       }else{
-        document.getElementById('res').innerHTML=`<div class="result-card"><div class="alert alert-danger">Sem JSON na resposta:</div><pre style="font-size:11px;overflow:auto;white-space:pre-wrap;margin-top:8px;padding:8px;background:#f5f5f5;border-radius:6px">${cleaned.substring(0,2000)}</pre></div>`;
+        document.getElementById('res').innerHTML=`<div class="result-card"><div class="alert alert-danger">Resposta inesperada. Tente novamente.</div></div>`;
         return;
       }
     }
